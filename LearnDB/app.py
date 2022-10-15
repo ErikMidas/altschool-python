@@ -7,13 +7,15 @@ base_dir = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(base_dir, 'users.db')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + \
+    os.path.join(base_dir, 'users.db')
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+
 class User(db.Model):
-    __tablename__="users"
+    __tablename__ = "users"
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
@@ -35,12 +37,14 @@ def index():
     users = User.query.all()
 
     context = {
-        'users':users
+        'users': users
     }
 
     return render_template("models.html", **context)
 
 # Creating a User
+
+
 @app.route('/users', methods={'POST'})
 def create_user():
     username = request.form.get('username')
@@ -52,10 +56,12 @@ def create_user():
 
     db.session.add(new_user)
     db.session.commit()
-    
+
     return redirect(url_for('index'))
 
 # Update route
+
+
 @app.route('/update/<int:id>/', methods=['GET', 'POST'])
 def update(id):
     user_to_update = User.query.get_or_404(id)
@@ -69,7 +75,7 @@ def update(id):
         db.session.commit()
 
         return redirect(url_for('index'))
-    
+
     context = {
         'user': user_to_update
     }
@@ -77,6 +83,8 @@ def update(id):
     return render_template('update.html', **context)
 
 # Delete
+
+
 @app.route('/delete/<int:id>/', methods=['GET'])
 def delete_user(id):
     user_to_delete = User.query.get_or_404(id)
@@ -85,7 +93,7 @@ def delete_user(id):
     db.session.commit()
 
     return redirect(url_for('index'))
-    
+
 
 if __name__ == "__main__":
     db.create_all()
