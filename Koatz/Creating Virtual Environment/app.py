@@ -14,9 +14,14 @@ def about():
     return "I am learning flask with Altschool"
 
 
-@app.route("/ayodeji/<name>/<dob>/<dob2>")
-def ayodeji(name, dob, dob2):
-    return f"My name is {name} and I was born on {dob} {dob2}"
+@app.route("/ayodeji/<name>/<string:month>/<int:day>")
+def ayodeji(name, month, day):
+    return f"My name is {name} and I was born on {month} {day}"
+
+
+@app.route('/post/<int:id>')
+def post_id(id):
+    return f"This post has a user id of {id}"
 
 
 if __name__ == "__main__":
