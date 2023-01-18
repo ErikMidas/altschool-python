@@ -1,40 +1,41 @@
+from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
+from models import StoreModel
 from db import db
-from models import StoreModel, ItemModel
-from schemas import StoreSchema
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import jwt_required
 
-blp = Blueprint("Stores", __name__, description="Operations on Stores")
+from schemas import StoreSchema
 
-@blp.route("/stores/<int:store_id>")
+blp = Blueprint("store", __name__, description="Operations on Stores")
+
+
+@blp.route("/store/<int:store_id>")
 class Store(MethodView):
     @jwt_required()
     @blp.response(200, StoreSchema)
     def get(self, store_id):
         store = StoreModel.query.get_or_404(store_id)
         return store
-    
+
     @jwt_required()
     def delete(self, store_id):
-        store_items = ItemModel.query.filter_by(store_id=store_id).all()
-        for item in store_items:
-            db.session.delete(item)
-            
         store = StoreModel.query.get_or_404(store_id)
         db.session.delete(store)
         db.session.commit()
+        
+        return {"message": "Store Deleted"}
 
-        return {"message": "Store deleted"}
 
-@blp.route("/stores")
+
+@blp.route("/store")
 class StoreList(MethodView):
     @jwt_required()
     @blp.response(200, StoreSchema(many=True))
     def get(self):
         return StoreModel.query.all()
-    
+
     @jwt_required()
     @blp.arguments(StoreSchema)
     @blp.response(200, StoreSchema)
@@ -45,17 +46,6 @@ class StoreList(MethodView):
             db.session.add(store)
             db.session.commit()
         except SQLAlchemyError:
-            abort(500, message="An error occured while creating the store")
+            abort(500, message="An error occured while creating the Store")
 
         return store, 201
-
-        # store = StoreModel()
-        # store = store_data
-
-        # if store: 
-        #     abort(400, message="Store Exists")
-
-        # db.session.add(store)
-        # db.session.commit()
-
-        # return store, 201
