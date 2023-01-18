@@ -88,7 +88,10 @@ def register():
         email_exists = User.query.filter_by(email=email).first()
         if email_exists:
             return redirect(url_for('register'))
-
+        
+        if password != confirm:
+            return redirect(url_for_('register')
+                            
         password_hash = generate_password_hash(password)
 
         new_user = User(username=username, email=email, password_hash=password_hash)
