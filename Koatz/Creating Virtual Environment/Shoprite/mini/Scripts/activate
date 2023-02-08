@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\ayode\CODIENE\Alt School\Python\altschool-python\Koatz\Creating Virtual Environment\shoprite\mini"
+VIRTUAL_ENV="C:\Users\ayode\CODIENE\Alt School\Python\altschool-python\Caleb\ministore\mini"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
