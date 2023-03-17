@@ -3,14 +3,13 @@ from flask_restx import Namespace, Resource, fields
 from ..models.users import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from http import HTTPStatus
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
-auth_namespace = Namespace("auth", description="name space for authentication")
+auth_namespace = Namespace("auth", description="Namespace for authentication")
 
 
 signup_model = auth_namespace.model(
     "SignUp", {
-        "id": fields.Integer(),
         "username": fields.String(required=True, description="A username"),
         "email": fields.String(required=True, description="An email"),
         "password": fields.String(required=True, description="A password")
@@ -18,9 +17,9 @@ signup_model = auth_namespace.model(
 )
 
 login_model = auth_namespace.model(
-    'Login', {
-        'email': fields.String(required=True, description="An email"),
-        'password': fields.String(required=True, description="A password")
+    "Login", {
+        "email": fields.String(required=True, description="An email"),
+        "password": fields.String(required=True, description="A password")
     }
 )
 
@@ -37,7 +36,6 @@ user_model = auth_namespace.model(
 
 @auth_namespace.route("/signup")
 class SignUp(Resource):
-    
     
     @auth_namespace.expect(signup_model)
     @auth_namespace.marshal_with(user_model)
@@ -67,6 +65,7 @@ class Login(Resource):
         """
             Generate JWT Token
         """
+        
         data = request.get_json()
 
         email = data.get("email")
@@ -86,3 +85,15 @@ class Login(Resource):
             return response, HTTPStatus.CREATED
 
     
+@auth_namespace.route("/refresh")
+class Refresh(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        """
+            Generate Refresh Token
+        """
+        username = get_jwt_identity()
+
+        access_token = create_access_token(identity=username)
+
+        return {"access_token": access_token}, HTTPStatus.OK
